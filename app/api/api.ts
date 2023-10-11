@@ -26,11 +26,21 @@ export interface Order {
 export async function fetchProducts(): Promise<Product[]> {
     try{
         const response = await fetch(`${API_URL}/products`);
+        return await response.json();
+    } catch (error) {
+        return error
+    }
+}
+
+export async function fetchProductDetails(productId: number): Promise<Product | null>{
+    try{
+        const response = await fetch(`${API_URL}/products/${productId}`);
         if (!response.ok) {
-            throw new Error(response.statusText);
+            throw new Error('Product not found');
         }
         return await response.json();
     } catch (error) {
-        return []
+        console.error('Error fetching product details', error);
+        return null;
     }
 }

@@ -1,5 +1,6 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NativeStackScreenProps, createNativeStackNavigator } from "@react-navigation/native-stack";
 import Products from "../screens/Products";
+import ProductDetails from "../screens/ProductDetails";
 
 
 type ProcuctsStackParamList = {
@@ -9,6 +10,11 @@ type ProcuctsStackParamList = {
 
 
 const ProductsStack = createNativeStackNavigator<ProcuctsStackParamList>();
+
+export type ProductsProps = NativeStackScreenProps<ProcuctsStackParamList, "Products">;
+
+export type ProductsDetailsPageProps = NativeStackScreenProps<ProcuctsStackParamList, "ProductDetails">;
+
 
 
 const ProductsStackNav = () => {
@@ -21,9 +27,12 @@ const ProductsStackNav = () => {
                 headerTintColor: "#141414",
             }}
         >
-            <ProductsStack.Screen name="Products" component={Products} options={{
+        <ProductsStack.Screen name="Products" component={Products} options={{
                 headerTitle: "Neon Shop",
-            }} />
+        }} />
+        <ProductsStack.Screen name="ProductDetails" component={ProductDetails} options={{
+                headerTitle: "",
+        }} />
         </ProductsStack.Navigator>
     );
 };
