@@ -15,9 +15,42 @@ const useCartStore = create<CartState>((set) => ({
     total: 0,
     addProduct: (product: Product) => 
         set((state) => {
-            return null;
+            const hasProduct = state.products.find((p) => p.id === product.id);
+            state.total += +product.product_price;
+
+            if (hasProduct){
+                return {
+                    products: state.products.map((p) => {
+                        if(p.id === product.id){
+                            return {
+                                ...p,
+                                quantity: p.quantity + 1,
+                            };
+                        }
+                        return p;
+                }),
+            };
+            } else {
+                return{
+                    products: [...state.products, {...product, quantity: 1}],
+                }
+            }
         }),
-        reduceProduct: (product: Product) => (null),
+        reduceProduct: (product: Product) => (set((state) => {
+                state.total -= product.product_price;
+                return {
+                    products: state.products.map((p) => {
+                        if(p.id === product.id){
+                            return {
+                                ...p,
+                                quantity: p.quantity - 1,
+                            };
+                        }
+                        return p;
+                    }).filter((p) => p.quantity > 0),
+                };
+            }
+            )),
         clearCart: () => 
         set((state) => {
             state.total = 0;

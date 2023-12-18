@@ -1,12 +1,26 @@
-import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ProductsDetailsPageProps } from "../navigation/ProductsStack";
 import { useEffect, useState } from "react";
 import { Product, fetchProductDetails } from "../api/api";
+import useCartStore from "../state/cartStore";
+import { Ionicons } from '@expo/vector-icons';
 
 
 const ProductDetails = ({ route }: ProductsDetailsPageProps) => {
     const { id } = route.params;
     const [product, setProduct] = useState<Product | null>(null);
+    const { products, addProduct, reduceProduct } = useCartStore((state) => ({
+        products: state.products,
+        addProduct: state.addProduct,
+        reduceProduct: state.reduceProduct,
+    }));
+    const [ count, setCount] = useState(0);
+
+    useEffect(() => {
+        console.log('UPDATE PRODUCTS');
+
+        updateProductQuantity();
+    }, [products]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -20,6 +34,15 @@ const ProductDetails = ({ route }: ProductsDetailsPageProps) => {
         };
         fetchProduct();
     }, []);
+
+    const updateProductQuantity = () => {
+        const result = products.filter(p => p.id === id);
+        if (result.length > 0) {
+            setCount(result[0].quantity);
+        } else {
+            setCount(0);
+        }
+    }
     
     return (
         <SafeAreaView style={styles.container}>
@@ -30,8 +53,24 @@ const ProductDetails = ({ route }: ProductsDetailsPageProps) => {
                 <Text style={styles.productCategory}>{product.product_category}</Text>
                 <Text style={styles.productDescription}>{product.product_description}</Text>
                 <Text style={styles.productPrice}>${product.product_price}</Text>
-            
 
+                <View style={styles.buttonsContainer}>
+                    <TouchableOpacity 
+                    style={styles.button}
+                    onPress={() => reduceProduct(product)}
+                    
+                    >
+                        <Ionicons name="remove" size={24} color={'#1FE687'} />
+                    </TouchableOpacity>
+                    <Text style={styles.quantity}>{count}</Text>
+
+                    <TouchableOpacity 
+                    style={styles.button}
+                    onPress={() => addProduct(product)}
+                    >
+                        <Ionicons name="add" size={24} color={'#1FE687'} />
+                    </TouchableOpacity>
+                </View>
                 </>
             )}
         </SafeAreaView>
@@ -67,6 +106,28 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 16,
     },
+    buttonsContainer:{
+        marginTop: 20,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 20,
+    },
+    button: {
+        paddingVertical: 12,
+        borderRadius: 8,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        flex: 1,
+        borderColor: "#1FE687",
+        borderWidth: 1,
+    },
+    quantity:{
+        fontSize: 26,
+        width: 50,
+        fontWeight: "bold",
+        textAlign: "center",
+    }
 });
 
 export default ProductDetails;
